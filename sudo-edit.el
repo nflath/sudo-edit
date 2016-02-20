@@ -43,7 +43,7 @@
   "Find a file and open it as root."
   (interactive "p")
   (if arg
-      (find-file (concat "/sudo:root@localhost:" (ido-read-file-name "File: ")))
+      (find-file (concat "/sudo:root@localhost:" (read-file-name "File: ")))
     (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
 
 (defun sudo-edit-current-file ()
