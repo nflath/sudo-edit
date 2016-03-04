@@ -15,6 +15,9 @@
 ;; sudo-edit
 ;; sudo-edit-current-file
 
+;; Suggested keybinding:
+;; (global-set-key (kbd "C-c C-r") 'sudo-edit-current-file)
+
 ;;; Installation
 
 ;; To use this mode, put the following in your init.el:
@@ -52,8 +55,6 @@
   (let ((pos (point)))
     (find-alternate-file (concat "/sudo:root@localhost:" (buffer-file-name (current-buffer))))
     (goto-char pos)))
-
-(global-set-key (kbd "C-c C-r") 'sudo-edit-current-file)
 
 (provide 'sudo-edit)
 ;;; sudo-edit.el ends here
