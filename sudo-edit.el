@@ -1,27 +1,13 @@
-;;; sudo-edit.el --- Utilities for opening files with sudo
+;;; sudo-edit.el --- Edit files as root               -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014 Nathaniel Flath <flat0103@gmail.com>
 
 ;; Author: Nathaniel Flath <flat0103@gmail.com>
+;; URL: https://github.com/nflath/sudo-edit
 ;; Version: 0.0.1
+;; Package-Requires: ((emacs "24.4"))
 
 ;; This file is not part of GNU Emacs.
-
-;;; Commentary:
-
-;; This file provides several utility functions for opening buffers
-;; as root using 'sudo'.  They are:
-
-;; sudo-edit
-;; sudo-edit-current-file
-
-;; Suggested keybinding:
-;; (global-set-key (kbd "C-c C-r") 'sudo-edit-current-file)
-
-;;; Installation
-
-;; To use this mode, put the following in your init.el:
-;; (require 'sudo-edit)
 
 ;;; License:
 
@@ -39,6 +25,23 @@
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
 ;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
+
+;;; Commentary:
+
+;; This file provides several utility functions for opening buffers
+;; as root using 'sudo'.  They are:
+;;
+;;     `sudo-edit'
+;;
+;; Suggested keybinding:
+;;
+;;     (global-set-key (kbd "C-c C-r") 'sudo-edit)
+;;
+;; Installation:
+;;
+;; To use this mode, put the following in your init.el:
+;;
+;;     (require 'sudo-edit)
 
 ;;; Code:
 (eval-when-compile
@@ -79,6 +82,8 @@ for a file to visit if current buffer is not visiting a file."
     (let ((position (point)))
       (find-alternate-file (sudo-edit-filename buffer-file-name))
       (goto-char position))))
+
+(define-obsolete-function-alias 'sudo-edit-current-file 'sudo-edit)
 
 (provide 'sudo-edit)
 ;;; sudo-edit.el ends here
