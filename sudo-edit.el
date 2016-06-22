@@ -41,20 +41,44 @@
 ;; Boston, MA 02110-1301, USA.
 
 ;;; Code:
+(eval-when-compile
+  (require 'subr-x))
 
+(require 'tramp)
+
+(defun sudo-edit-filename (file-name)
+  "Return a sudo edit name for a FILE-NAME."
+  (if (file-remote-p file-name)
+      (let* ((vec (tramp-dissect-file-name file-name))
+             (hop (tramp-make-tramp-file-name
+                   (tramp-file-name-method vec)
+                   (tramp-file-name-user vec)
+                   (tramp-file-name-host vec)
+                   ""
+                   (tramp-file-name-hop vec))))
+        (setq hop (string-remove-prefix tramp-prefix-format hop))
+        (setq hop (string-remove-suffix tramp-postfix-host-format hop))
+        (setq hop (concat hop tramp-postfix-hop-format))
+        (tramp-make-tramp-file-name
+         "sudo"
+         ""
+         (tramp-file-name-host vec)
+         (tramp-file-name-localname vec)
+         hop))
+    (concat "/sudo::" file-name)))
+
+;;;###autoload
 (defun sudo-edit (&optional arg)
-  "Find a file and open it as root."
-  (interactive "p")
-  (if arg
-      (find-file (concat "/sudo:root@localhost:" (read-file-name "File: ")))
-    (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
+  "Edit currently visited file as root.
 
-(defun sudo-edit-current-file ()
-  "Edit the current file as root."
-  (interactive)
-  (let ((pos (point)))
-    (find-alternate-file (concat "/sudo:root@localhost:" (buffer-file-name (current-buffer))))
-    (goto-char pos)))
+With a prefix ARG prompt for a file to visit.  Will also prompt
+for a file to visit if current buffer is not visiting a file."
+  (interactive "P")
+  (if (or arg (not buffer-file-name))
+      (find-file (sudo-edit-filename (read-file-name "Find file(as root): ")))
+    (let ((position (point)))
+      (find-alternate-file (sudo-edit-filename buffer-file-name))
+      (goto-char position))))
 
 (provide 'sudo-edit)
 ;;; sudo-edit.el ends here
