@@ -1,27 +1,13 @@
-;;; sudo-edit.el --- Utilities for opening files with sudo
+;;; sudo-edit.el --- Edit files as root               -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014 Nathaniel Flath <flat0103@gmail.com>
 
 ;; Author: Nathaniel Flath <flat0103@gmail.com>
+;; URL: https://github.com/nflath/sudo-edit
 ;; Version: 0.0.1
+;; Package-Requires: ((emacs "24.4"))
 
 ;; This file is not part of GNU Emacs.
-
-;;; Commentary:
-
-;; This file provides several utility functions for opening buffers
-;; as root using 'sudo'.  They are:
-
-;; sudo-edit
-;; sudo-edit-current-file
-
-;; Suggested keybinding:
-;; (global-set-key (kbd "C-c C-r") 'sudo-edit-current-file)
-
-;;; Installation
-
-;; To use this mode, put the following in your init.el:
-;; (require 'sudo-edit)
 
 ;;; License:
 
@@ -40,21 +26,64 @@
 ;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 ;; Boston, MA 02110-1301, USA.
 
+;;; Commentary:
+
+;; This file provides several utility functions for opening buffers
+;; as root using 'sudo'.  They are:
+;;
+;;     `sudo-edit'
+;;
+;; Suggested keybinding:
+;;
+;;     (global-set-key (kbd "C-c C-r") 'sudo-edit)
+;;
+;; Installation:
+;;
+;; To use this mode, put the following in your init.el:
+;;
+;;     (require 'sudo-edit)
+
 ;;; Code:
+(eval-when-compile
+  (require 'subr-x))
 
+(require 'tramp)
+
+(defun sudo-edit-filename (file-name)
+  "Return a sudo edit name for a FILE-NAME."
+  (if (file-remote-p file-name)
+      (let* ((vec (tramp-dissect-file-name file-name))
+             (hop (tramp-make-tramp-file-name
+                   (tramp-file-name-method vec)
+                   (tramp-file-name-user vec)
+                   (tramp-file-name-host vec)
+                   ""
+                   (tramp-file-name-hop vec))))
+        (setq hop (string-remove-prefix tramp-prefix-format hop))
+        (setq hop (string-remove-suffix tramp-postfix-host-format hop))
+        (setq hop (concat hop tramp-postfix-hop-format))
+        (tramp-make-tramp-file-name
+         "sudo"
+         ""
+         (tramp-file-name-host vec)
+         (tramp-file-name-localname vec)
+         hop))
+    (concat "/sudo::" file-name)))
+
+;;;###autoload
 (defun sudo-edit (&optional arg)
-  "Find a file and open it as root."
-  (interactive "p")
-  (if arg
-      (find-file (concat "/sudo:root@localhost:" (read-file-name "File: ")))
-    (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
+  "Edit currently visited file as root.
 
-(defun sudo-edit-current-file ()
-  "Edit the current file as root."
-  (interactive)
-  (let ((pos (point)))
-    (find-alternate-file (concat "/sudo:root@localhost:" (buffer-file-name (current-buffer))))
-    (goto-char pos)))
+With a prefix ARG prompt for a file to visit.  Will also prompt
+for a file to visit if current buffer is not visiting a file."
+  (interactive "P")
+  (if (or arg (not buffer-file-name))
+      (find-file (sudo-edit-filename (read-file-name "Find file(as root): ")))
+    (let ((position (point)))
+      (find-alternate-file (sudo-edit-filename buffer-file-name))
+      (goto-char position))))
+
+(define-obsolete-function-alias 'sudo-edit-current-file 'sudo-edit)
 
 (provide 'sudo-edit)
 ;;; sudo-edit.el ends here
