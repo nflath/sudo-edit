@@ -42,6 +42,7 @@
 
 ;;; Code:
 
+;;;###autoload
 (defun sudo-edit (&optional arg)
   "Find a file and open it as root."
   (interactive "p")
@@ -49,6 +50,7 @@
       (find-file (concat "/sudo:root@localhost:" (read-file-name "File: ")))
     (find-alternate-file (concat "/sudo:root@localhost:" buffer-file-name))))
 
+;;;###autoload
 (defun sudo-edit-current-file ()
   "Edit the current file as root."
   (interactive)
