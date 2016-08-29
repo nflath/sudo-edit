@@ -46,9 +46,48 @@
 ;;; Code:
 (eval-when-compile
   (require 'cl-lib)
-  (require 'subr-x))
+  (require 'subr-x nil 'no-error))
 
 (require 'tramp)
+
+;; Compatibility for Emacs 24.3 and earlier
+(eval-and-compile
+  (unless (fboundp 'string-prefix-p)
+    (defun string-prefix-p (prefix string &optional ignore-case)
+      "Return non-nil if PREFIX is a prefix of STRING.
+If IGNORE-CASE is non-nil, the comparison is done without paying attention
+to case differences."
+      (let ((prefix-length (length prefix)))
+        (if (> prefix-length (length string)) nil
+          (eq t (compare-strings prefix 0 prefix-length string
+                                 0 prefix-length ignore-case))))))
+
+  (unless (fboundp 'string-suffix-p)
+    (defun string-suffix-p (suffix string  &optional ignore-case)
+      "Return non-nil if SUFFIX is a suffix of STRING.
+If IGNORE-CASE is non-nil, the comparison is done without paying
+attention to case differences."
+      (let ((start-pos (- (length string) (length suffix))))
+        (and (>= start-pos 0)
+             (eq t (compare-strings suffix nil nil
+                                    string start-pos nil ignore-case))))))
+
+  (unless (featurep 'subr-x)
+    (defsubst string-remove-prefix (prefix string)
+      "Remove PREFIX from STRING if present."
+      (if (string-prefix-p prefix string)
+          (substring string (length prefix))
+        string))
+
+    (defsubst string-remove-suffix (suffix string)
+      "Remove SUFFIX from STRING if present."
+      (if (string-suffix-p suffix string)
+          (substring string 0 (- (length string) (length suffix)))
+        string))
+
+    (defsubst string-blank-p (string)
+      "Check whether STRING is either empty or only whitespace."
+      (string-match-p "\\`[ \t\n\r]*\\'" string))))
 
 (defgroup sudo-edit nil
   "Edit files as another user."
