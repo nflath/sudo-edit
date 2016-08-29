@@ -33,7 +33,7 @@
 (declare-function undercover "undercover")
 
 (when (require 'undercover nil 'no-error)
-  (undercover "envoy.el"))
+  (undercover "sudo-edit.el"))
 
 (require 'sudo-edit)
 

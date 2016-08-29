@@ -18,7 +18,7 @@ all: compile
 
 compile: $(OBJS)
 
-test: clean-elc
+test:
 	$(CASK) exec $(EMACSBATCH) -L . -l sudo-edit-test.el -f ert-run-tests-batch-and-exit
 
 clean: clean-elc
