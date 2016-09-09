@@ -101,12 +101,24 @@ attention to case differences."
 
 (defvar sudo-edit-user-history nil)
 
+(defun sudo-edit-out-of-band-ssh-p (vec)
+  "Check if tramp VEC is a out-of-band method and use ssh."
+  (and (or (tramp-get-method-parameter vec 'tramp-copy-program)
+           (tramp-get-method-parameter (tramp-file-name-method vec) 'tramp-copy-program))
+       (string= (or (tramp-get-method-parameter vec 'tramp-login-program)
+                    (tramp-get-method-parameter (tramp-file-name-method vec) 'tramp-login-program))
+                "ssh")))
+
 (defun sudo-edit-filename (filename user)
   "Return a tramp edit name for a FILENAME as USER."
   (if (file-remote-p filename)
       (let* ((vec (tramp-dissect-file-name filename))
+             ;; XXX: Change to ssh method on out-of-band ssh based methods
+             (method (if (sudo-edit-out-of-band-ssh-p vec)
+                         "ssh"
+                       (tramp-file-name-method vec)))
              (hop (tramp-make-tramp-file-name
-                   (tramp-file-name-method vec)
+                   method
                    (tramp-file-name-user vec)
                    (tramp-file-name-host vec)
                    ""

@@ -46,11 +46,20 @@
                  "/ssh:remotehost|sudo:root@remotehost:/path/to/example.txt"))
   (should (equal (sudo-edit-filename "/ssh:remotehost|sudo:root@remotehost:/path/to/example.txt" "www-data")
                  "/ssh:remotehost|sudo:root@remotehost|sudo:www-data@remotehost:/path/to/example.txt"))
+
+  ;; Change method from scp to ssh in ssh related methods
+  (should (equal (sudo-edit-filename "/scp:remotehost:/path/to/example.txt" "root")
+                 "/ssh:remotehost|sudo:root@remotehost:/path/to/example.txt"))
+
   ;; tramp multi-hops files
   (should (equal (sudo-edit-filename "/ssh:machine1|ssh:machine2:/path/to/example.txt" "root")
                  "/ssh:machine1|ssh:machine2|sudo:root@machine2:/path/to/example.txt"))
   (should (equal (sudo-edit-filename "/ssh:machine1|ssh:machine2|sudo:root@machine2:/path/to/example.txt" "www-data")
                  "/ssh:machine1|ssh:machine2|sudo:root@machine2|sudo:www-data@machine2:/path/to/example.txt")))
+
+(ert-deftest sudo-edit-sudo-edit-out-of-band-ssh-p-test ()
+  (should (sudo-edit-out-of-band-ssh-p (tramp-dissect-file-name "/scp:remotehost:/path/to/example.txt")))
+  (should-not (sudo-edit-out-of-band-ssh-p (tramp-dissect-file-name "/telnet:remotehost:/path/to/example.txt"))))
 
 (provide 'sudo-edit-test)
 
