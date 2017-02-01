@@ -126,7 +126,10 @@ attention to case differences."
         (setq hop (string-remove-prefix tramp-prefix-format hop))
         (setq hop (string-remove-suffix tramp-postfix-host-format hop))
         (setq hop (concat hop tramp-postfix-hop-format))
-        (tramp-make-tramp-file-name "sudo" user (tramp-file-name-host vec) (tramp-file-name-localname vec) hop))
+        (if (and (string= user (tramp-file-name-user vec))
+                 (string-match tramp-local-host-regexp (tramp-file-name-host vec)))
+            (tramp-file-name-localname vec)
+          (tramp-make-tramp-file-name "sudo" user (tramp-file-name-host vec) (tramp-file-name-localname vec) hop)))
     (tramp-make-tramp-file-name "sudo" user "localhost" (expand-file-name filename))))
 
 ;;;###autoload
