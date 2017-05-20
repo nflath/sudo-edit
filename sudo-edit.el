@@ -123,8 +123,8 @@ attention to case differences."
                    (tramp-file-name-host vec)
                    ""
                    (tramp-file-name-hop vec))))
-        (setq hop (string-remove-prefix tramp-prefix-format hop))
-        (setq hop (string-remove-suffix tramp-postfix-host-format hop))
+        (setq hop (string-remove-prefix (if (fboundp 'tramp-prefix-format) (tramp-prefix-format) (bound-and-true-p tramp-prefix-format)) hop))
+        (setq hop (string-remove-suffix (if (fboundp 'tramp-postfix-host-format) (tramp-postfix-host-format) (bound-and-true-p tramp-postfix-host-format)) hop))
         (setq hop (concat hop tramp-postfix-hop-format))
         (if (and (string= user (tramp-file-name-user vec))
                  (string-match tramp-local-host-regexp (tramp-file-name-host vec)))
