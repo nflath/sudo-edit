@@ -140,7 +140,7 @@ With a prefix ARG prompt for a file to visit.  Will also prompt
 for a file to visit if current buffer is not visiting a file."
   (interactive "P")
   (let ((user (if arg
-                  (completing-read "User: " (system-users) nil nil nil 'sudo-edit-user-history sudo-edit-user)
+                  (completing-read "User: " (and (fboundp 'system-users) (system-users)) nil nil nil 'sudo-edit-user-history sudo-edit-user)
                 sudo-edit-user))
         (filename (or buffer-file-name
                       (and (derived-mode-p 'dired-mode) default-directory))))
