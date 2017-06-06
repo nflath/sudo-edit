@@ -101,13 +101,18 @@ attention to case differences."
 
 (defvar sudo-edit-user-history nil)
 
+(defun sudo-edit-tramp-get-parameter (vec param)
+  "Return from tramp VEC a parameter PARAM."
+  (or (tramp-get-method-parameter vec param)
+      ;; NB: Compatibility old versions of TRAMP 2.2.x shipped with Emacs 24.3
+      ;;     and earlier.  Ignore errors when the method doesn't have the
+      ;;     parameter as static value defined in `tramp-methods'.
+      (ignore-errors (tramp-get-method-parameter (tramp-file-name-method vec) param))))
+
 (defun sudo-edit-out-of-band-ssh-p (vec)
   "Check if tramp VEC is a out-of-band method and use ssh."
-  (and (or (tramp-get-method-parameter vec 'tramp-copy-program)
-           (tramp-get-method-parameter (tramp-file-name-method vec) 'tramp-copy-program))
-       (string= (or (tramp-get-method-parameter vec 'tramp-login-program)
-                    (tramp-get-method-parameter (tramp-file-name-method vec) 'tramp-login-program))
-                "ssh")))
+  (and (sudo-edit-tramp-get-parameter vec 'tramp-copy-program)
+       (string-equal (sudo-edit-tramp-get-parameter vec 'tramp-login-program) "ssh")))
 
 (defun sudo-edit-filename (filename user)
   "Return a tramp edit name for a FILENAME as USER."
