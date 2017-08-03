@@ -125,7 +125,9 @@ attention to case differences."
              (hop (tramp-make-tramp-file-name
                    method
                    (tramp-file-name-user vec)
+                   (tramp-file-name-domain vec)
                    (tramp-file-name-host vec)
+                   (tramp-file-name-port vec)
                    ""
                    (tramp-file-name-hop vec))))
         (setq hop (string-remove-prefix (if (fboundp 'tramp-prefix-format) (tramp-prefix-format) (bound-and-true-p tramp-prefix-format)) hop))
@@ -134,8 +136,8 @@ attention to case differences."
         (if (and (string= user (tramp-file-name-user vec))
                  (string-match tramp-local-host-regexp (tramp-file-name-host vec)))
             (tramp-file-name-localname vec)
-          (tramp-make-tramp-file-name "sudo" user (tramp-file-name-host vec) (tramp-file-name-localname vec) hop)))
-    (tramp-make-tramp-file-name "sudo" user "localhost" (expand-file-name filename))))
+          (tramp-make-tramp-file-name "sudo" user (tramp-file-name-domain vec) (tramp-file-name-host vec) (tramp-file-name-port vec) (tramp-file-name-localname vec) hop)))
+    (tramp-make-tramp-file-name "sudo" user nil "localhost" nil (expand-file-name filename))))
 
 ;;;###autoload
 (defun sudo-edit (&optional arg)
