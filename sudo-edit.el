@@ -101,6 +101,18 @@ attention to case differences."
 
 (defvar sudo-edit-user-history nil)
 
+;; NB: TRAMP 2.3.2 introduced `tramp-file-name' struct which offers these
+;;     functions to access the slots.
+(or (fboundp 'tramp-file-name-domain) (defalias 'tramp-file-name-domain #'ignore))
+(or (fboundp 'tramp-file-name-port) (defalias 'tramp-file-name-port #'ignore))
+
+(defalias 'sudo-edit-make-tramp-file-name
+  (if (version< tramp-version "2.3.2")
+      (with-no-warnings
+        (lambda (method user _domain host _port localname &optional hop)
+          (tramp-make-tramp-file-name method user host localname hop)))
+    #'tramp-make-tramp-file-name))
+
 (defun sudo-edit-tramp-get-parameter (vec param)
   "Return from tramp VEC a parameter PARAM."
   (or (tramp-get-method-parameter vec param)
@@ -122,7 +134,7 @@ attention to case differences."
              (method (if (sudo-edit-out-of-band-ssh-p vec)
                          "ssh"
                        (tramp-file-name-method vec)))
-             (hop (tramp-make-tramp-file-name
+             (hop (sudo-edit-make-tramp-file-name
                    method
                    (tramp-file-name-user vec)
                    (tramp-file-name-domain vec)
@@ -136,8 +148,8 @@ attention to case differences."
         (if (and (string= user (tramp-file-name-user vec))
                  (string-match tramp-local-host-regexp (tramp-file-name-host vec)))
             (tramp-file-name-localname vec)
-          (tramp-make-tramp-file-name "sudo" user (tramp-file-name-domain vec) (tramp-file-name-host vec) (tramp-file-name-port vec) (tramp-file-name-localname vec) hop)))
-    (tramp-make-tramp-file-name "sudo" user nil "localhost" nil (expand-file-name filename))))
+          (sudo-edit-make-tramp-file-name "sudo" user (tramp-file-name-domain vec) (tramp-file-name-host vec) (tramp-file-name-port vec) (tramp-file-name-localname vec) hop)))
+    (sudo-edit-make-tramp-file-name "sudo" user nil "localhost" nil (expand-file-name filename))))
 
 ;;;###autoload
 (defun sudo-edit (&optional arg)
