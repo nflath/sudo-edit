@@ -58,8 +58,9 @@
                  "/ssh:machine1|ssh:machine2|sudo:root@machine2|sudo:www-data@machine2:/path/to/example.txt")))
 
 (ert-deftest sudo-edit-sudo-edit-out-of-band-ssh-p-test ()
-  (should (sudo-edit-out-of-band-ssh-p (tramp-dissect-file-name "/scp:remotehost:/path/to/example.txt")))
-  (should-not (sudo-edit-out-of-band-ssh-p (tramp-dissect-file-name "/telnet:remotehost:/path/to/example.txt"))))
+  (should (sudo-edit-out-of-band-ssh-p "/scp:remotehost:/path/to/example.txt"))
+  (should (sudo-edit-out-of-band-ssh-p "/sftp:remotehost:/path/to/example.txt"))
+  (should-not (sudo-edit-out-of-band-ssh-p "/telnet:remotehost:/path/to/example.txt")))
 
 (provide 'sudo-edit-test)
 

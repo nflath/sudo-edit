@@ -121,17 +121,19 @@ attention to case differences."
       ;;     parameter as static value defined in `tramp-methods'.
       (ignore-errors (tramp-get-method-parameter (tramp-file-name-method vec) param))))
 
-(defun sudo-edit-out-of-band-ssh-p (vec)
-  "Check if tramp VEC is a out-of-band method and use ssh."
-  (and (sudo-edit-tramp-get-parameter vec 'tramp-copy-program)
-       (string-equal (sudo-edit-tramp-get-parameter vec 'tramp-login-program) "ssh")))
+(defun sudo-edit-out-of-band-ssh-p (filename)
+  "Check if tramp FILENAME is a out-of-band method and use ssh."
+  (or (let ((vec (tramp-dissect-file-name filename)))
+        (and (sudo-edit-tramp-get-parameter vec 'tramp-copy-program)
+             (string-equal (sudo-edit-tramp-get-parameter vec 'tramp-login-program) "ssh")))
+      (tramp-gvfs-file-name-p filename)))
 
 (defun sudo-edit-filename (filename user)
   "Return a tramp edit name for a FILENAME as USER."
   (if (file-remote-p filename)
       (let* ((vec (tramp-dissect-file-name filename))
              ;; XXX: Change to ssh method on out-of-band ssh based methods
-             (method (if (sudo-edit-out-of-band-ssh-p vec)
+             (method (if (sudo-edit-out-of-band-ssh-p filename)
                          "ssh"
                        (tramp-file-name-method vec)))
              (hop (sudo-edit-make-tramp-file-name
