@@ -99,6 +99,36 @@ attention to case differences."
   :type 'string
   :group 'sudo-edit)
 
+(defface sudo-edit-header-face
+  '((t (:foreground "white" :background "red3")))
+  "*Face use to display header-lines for files opened as root."
+  :group 'sudo-edit)
+
+;;;###autoload
+(defun sudo-edit-set-header ()
+  "*Display a warning in header line of the current buffer.
+This function is suitable to add to `find-file-hook' and `dired-file-hook'."
+  (when (string-equal
+         (file-remote-p (or buffer-file-name default-directory) 'user)
+         "root")
+    (setq header-line-format
+          (propertize "--- WARNING: EDITING FILE AS ROOT! %-"
+                      'face 'sudo-edit-header-face))))
+
+;;;###autoload
+(define-minor-mode sudo-edit-indicator-mode
+  "Indicates editing as root by displaying a message in the header line."
+  :global t
+  :lighter nil
+  :group 'sudo-edit
+
+  (if sudo-edit-indicator-mode
+      (progn
+        (add-hook 'find-file-hook #'sudo-edit-set-header)
+        (add-hook 'dired-mode-hook #'sudo-edit-set-header))
+    (remove-hook 'find-file-hook #'sudo-edit-set-header)
+    (remove-hook 'dired-mode-hook #'sudo-edit-set-header)))
+
 (defvar sudo-edit-user-history nil)
 
 ;; NB: TRAMP 2.3.2 introduced `tramp-file-name' struct which offers these
