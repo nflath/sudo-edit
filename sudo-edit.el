@@ -116,13 +116,13 @@ This function is suitable to add to `find-file-hook' and `dired-file-hook'."
                       'face 'sudo-edit-header-face))))
 
 ;;;###autoload
-(define-minor-mode sudo-indicator-mode
+(define-minor-mode sudo-edit-indicator-mode
   "Indicates editing as root by displaying a message in the header line."
   :global t
   :lighter nil
   :group 'sudo-edit
 
-  (if sudo-indicator-mode
+  (if sudo-edit-indicator-mode
       (progn
         (add-hook 'find-file-hook #'sudo-edit-set-header)
         (add-hook 'dired-mode-hook #'sudo-edit-set-header))
