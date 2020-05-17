@@ -202,6 +202,14 @@ for a file to visit if current buffer is not visiting a file."
         (find-alternate-file (sudo-edit-filename filename user))
         (goto-char position)))))
 
+;;;###autoload
+(defun sudo-edit-find-file (filename)
+  "Edit FILENAME as another user, by default `sudo-edit-user'."
+  (interactive
+   (read-file-name (format "Find file (as \"%s\"): " sudo-edit-user)))
+  (cl-assert (not (string-blank-p sudo-edit-user)) nil "User must not be a empty string")
+  (find-file (sudo-edit-filename filename sudo-edit-user)))
+
 (define-obsolete-function-alias 'sudo-edit-current-file 'sudo-edit)
 
 (provide 'sudo-edit)
