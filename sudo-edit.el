@@ -5,7 +5,7 @@
 ;; Author: Nathaniel Flath <flat0103@gmail.com>
 ;; URL: https://github.com/nflath/sudo-edit
 ;; Keywords: convenience
-;; Version: 0.0.1
+;; Version: 0.0.1a
 ;; Package-Requires: ((emacs "24") (cl-lib "0.5"))
 
 ;; This file is not part of GNU Emacs.
@@ -206,7 +206,7 @@ for a file to visit if current buffer is not visiting a file."
 (defun sudo-edit-find-file (filename)
   "Edit FILENAME as another user, by default `sudo-edit-user'."
   (interactive
-   (read-file-name (format "Find file (as \"%s\"): " sudo-edit-user)))
+   (list (read-file-name (format "Find file (as \"%s\"): " sudo-edit-user))))
   (cl-assert (not (string-blank-p sudo-edit-user)) nil "User must not be a empty string")
   (find-file (sudo-edit-filename filename sudo-edit-user)))
 
