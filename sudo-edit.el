@@ -210,7 +210,7 @@ for a file to visit if current buffer is not visiting a file."
   (cl-assert (not (string-blank-p sudo-edit-user)) nil "User must not be a empty string")
   (find-file (sudo-edit-filename filename sudo-edit-user)))
 
-(define-obsolete-function-alias 'sudo-edit-current-file 'sudo-edit)
+(define-obsolete-function-alias 'sudo-edit-current-file 'sudo-edit "2016-09-05")
 
 (provide 'sudo-edit)
 ;;; sudo-edit.el ends here
