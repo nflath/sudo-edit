@@ -99,6 +99,21 @@ attention to case differences."
   :type 'string
   :group 'sudo-edit)
 
+(defcustom sudo-edit-local-method "sudo"
+  "Tramp method to use with `sudo-edit' for local files."
+  :type '(choice
+          (const "sudo")
+          (const "su"))
+  :group 'sudo-edit)
+
+(defcustom sudo-edit-remote-method nil
+  "Tramp method to use with `sudo-edit' for remote files."
+  :type '(choice
+          (const :tag "Use local medthod" nil)
+          (const "sudo")
+          (const "su"))
+  :group 'sudo-edit)
+
 (defface sudo-edit-header-face
   '((t (:foreground "white" :background "red3")))
   "*Face use to display header-lines for files opened as root."
@@ -173,15 +188,16 @@ This function is suitable to add to `find-file-hook' and `dired-file-hook'."
                    (tramp-file-name-host vec)
                    (tramp-file-name-port vec)
                    ""
-                   (tramp-file-name-hop vec))))
+                   (tramp-file-name-hop vec)))
+             (remote-method (or sudo-edit-remote-method sudo-edit-local-method)))
         (setq hop (string-remove-prefix (if (fboundp 'tramp-prefix-format) (tramp-prefix-format) (bound-and-true-p tramp-prefix-format)) hop))
         (setq hop (string-remove-suffix (if (fboundp 'tramp-postfix-host-format) (tramp-postfix-host-format) (bound-and-true-p tramp-postfix-host-format)) hop))
         (setq hop (concat hop tramp-postfix-hop-format))
         (if (and (string= user (tramp-file-name-user vec))
                  (string-match tramp-local-host-regexp (tramp-file-name-host vec)))
             (tramp-file-name-localname vec)
-          (sudo-edit-make-tramp-file-name "sudo" user (tramp-file-name-domain vec) (tramp-file-name-host vec) (tramp-file-name-port vec) (tramp-file-name-localname vec) hop)))
-    (sudo-edit-make-tramp-file-name "sudo" user nil "localhost" nil (expand-file-name filename))))
+          (sudo-edit-make-tramp-file-name remote-method user (tramp-file-name-domain vec) (tramp-file-name-host vec) (tramp-file-name-port vec) (tramp-file-name-localname vec) hop)))
+    (sudo-edit-make-tramp-file-name sudo-edit-local-method user nil "localhost" nil (expand-file-name filename))))
 
 ;;;###autoload
 (defun sudo-edit (&optional arg)
