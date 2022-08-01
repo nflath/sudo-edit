@@ -103,14 +103,16 @@ attention to case differences."
   "Tramp method to use with `sudo-edit' for local files."
   :type '(choice
           (const "sudo")
+          (const "doas")
           (const "su"))
   :group 'sudo-edit)
 
 (defcustom sudo-edit-remote-method nil
   "Tramp method to use with `sudo-edit' for remote files."
   :type '(choice
-          (const :tag "Use local medthod" nil)
+          (const :tag "Use local method" nil)
           (const "sudo")
+          (const "doas")
           (const "su"))
   :group 'sudo-edit)
 
