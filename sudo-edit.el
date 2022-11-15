@@ -31,7 +31,7 @@
 
 ;; This package allows to open files as another user, by default "root":
 ;;
-;;     `sudo-edit'
+;;     M-x sudo-edit
 ;;
 ;; Suggested keybinding:
 ;;

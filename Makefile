@@ -21,6 +21,14 @@ compile: $(OBJS)
 test:
 	$(CASK) exec $(EMACSBATCH) -L . -l sudo-edit-test.el -f ert-run-tests-batch-and-exit
 
+README.md: make-readme-markdown.el sudo-edit.el
+	$(CASK) exec $(EMACSBATCH) --script $< <sudo-edit.el >$@ 2>/dev/null
+
+make-readme-markdown.el:
+	$(WGET) -q -O $@ "https://raw.github.com/mgalgs/make-readme-markdown/master/make-readme-markdown.el"
+
+.INTERMEDIATE: make-readme-markdown.el
+
 clean: clean-elc
 
 clean-elc:
