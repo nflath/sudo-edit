@@ -57,6 +57,25 @@
   (should (equal (sudo-edit-filename "/ssh:machine1|ssh:machine2|sudo:root@machine2:/path/to/example.txt" "www-data")
                  "/ssh:machine1|ssh:machine2|sudo:root@machine2|sudo:www-data@machine2:/path/to/example.txt")))
 
+(ert-deftest sudo-edit-make-tramp-file-name-test ()
+  (should (equal (sudo-edit-make-tramp-file-name
+                  "ssh" "user" "domain" "remotehost" "2222" "/tmp/file")
+                 "/ssh:user%domain@remotehost#2222:/tmp/file"))
+  ;; Hops must be preserved even when TRAMP hides ad-hoc proxies normally.
+  (let ((tramp-show-ad-hoc-proxies nil))
+    (should (equal (sudo-edit-make-tramp-file-name
+                    "sudo" "root" nil "remotehost" nil "/tmp/file"
+                    "ssh:remotehost|")
+                   "/ssh:remotehost|sudo:root@remotehost:/tmp/file"))))
+
+(ert-deftest sudo-edit-custom-methods-test ()
+  (let ((sudo-edit-local-method "doas")
+        (sudo-edit-remote-method "su"))
+    (should (equal (sudo-edit-filename "/tmp/file" "root")
+                   "/doas:root@localhost:/tmp/file"))
+    (should (equal (sudo-edit-filename "/ssh:remotehost:/tmp/file" "root")
+                   "/ssh:remotehost|su:root@remotehost:/tmp/file"))))
+
 (ert-deftest sudo-edit-sudo-edit-out-of-band-ssh-p-test ()
   (should (sudo-edit-out-of-band-ssh-p "/scp:remotehost:/path/to/example.txt"))
   (should (sudo-edit-out-of-band-ssh-p "/sftp:remotehost:/path/to/example.txt"))
