@@ -153,12 +153,21 @@ This function is suitable to add to `find-file-hook' and `dired-file-hook'."
 (or (fboundp 'tramp-file-name-domain) (defalias 'tramp-file-name-domain #'ignore))
 (or (fboundp 'tramp-file-name-port) (defalias 'tramp-file-name-port #'ignore))
 
-(defalias 'sudo-edit-make-tramp-file-name
+(defun sudo-edit-make-tramp-file-name
+    (method user domain host port localname &optional hop)
+  "Construct a Tramp file name from its components.
+METHOD, USER, DOMAIN, HOST, PORT, LOCALNAME and HOP have the same
+meaning as the corresponding `tramp-file-name' slots."
   (if (version< tramp-version "2.3.2")
       (with-no-warnings
-        (lambda (method user _domain host _port localname &optional hop)
-          (tramp-make-tramp-file-name method user host localname hop)))
-    #'tramp-make-tramp-file-name))
+        (tramp-make-tramp-file-name method user host localname hop))
+    (let ((tramp-show-ad-hoc-proxies
+           (or hop (bound-and-true-p tramp-show-ad-hoc-proxies))))
+      (tramp-make-tramp-file-name
+       (make-tramp-file-name
+        :method method :user user :domain domain :host host :port port
+        :localname localname :hop hop)
+       localname))))
 
 (defun sudo-edit-tramp-get-parameter (vec param)
   "Return from tramp VEC a parameter PARAM."
